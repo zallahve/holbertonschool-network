@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Update /etc/hosts so localhost and facebook.com resolve to required IPs
+
+set -euo pipefail
+
+HOSTS_FILE="/etc/hosts"
+
+# Make sure localhost resolves to 127.0.0.2
+if grep -qE '^[[:space:]]*127\.0\.0\.1[[:space:]]+localhost([[:space:]]|$)' "$HOSTS_FILE"; then
+  sed -i 's/^[[:space:]]*127\.0\.0\.1[[:space:]]\+localhost/127.0.0.2 localhost/' "$HOSTS_FILE"
+elif ! grep -qE '^[[:space:]]*127\.0\.0\.2[[:space:]]+localhost([[:space:]]|$)' "$HOSTS_FILE"; then
+  echo "127.0.0.2 localhost" >> "$HOSTS_FILE"
+fi
+
+# Make sure facebook.com resolves to 8.8.8.8 (remove any existing mapping first)
+sed -i '/[[:space:]]facebook\.com\([[:space:]]\|$\)/d' "$HOSTS_FILE"
+echo "8.8.8.8 facebook.com" >> "$HOSTS_FILE"
